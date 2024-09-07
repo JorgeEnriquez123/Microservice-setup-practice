@@ -21,7 +21,7 @@ public class InventoryController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @GetMapping("/{productId}")
+    @GetMapping("/product/{productId}")
     public ResponseEntity<Inventory> getInventory(@PathVariable Long productId) {
         Inventory inventory = inventoryService.getInventory(productId);
         if (inventory == null) {
@@ -36,7 +36,7 @@ public class InventoryController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{productId}")
+    @DeleteMapping("/product/{productId}")
     public ResponseEntity<Void> deleteInventory(@PathVariable Long productId) {
         inventoryService.deleteInventory(productId);
         return ResponseEntity.noContent().build();
