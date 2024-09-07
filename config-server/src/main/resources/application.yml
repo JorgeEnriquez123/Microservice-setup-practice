@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: configserver
+  profiles:
+#   active: native
+    active: git
+  cloud:
+    config:
+      server:
+#       native:
+#       search-locations: "classpaths:/config"
+        git:
+          uri: "https://github.com/JorgeEnriquez123/Microservice-setup-practice-configserver.git"
+          default-label: main
+          timeout: 5
+          clone-on-start: true
+          force-pull: true
+server:
+  port: 8888
