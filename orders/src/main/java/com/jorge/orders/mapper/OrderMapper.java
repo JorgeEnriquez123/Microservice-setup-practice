@@ -35,13 +35,4 @@ public class OrderMapper {
                 .build();
         return order;
     }
-
-    public Order toEntity(CreateOrderDto orderDto) {
-        Order order = Order.builder()
-                .customerId(orderDto.getCustomerId())
-                .items(orderDto.getItems().stream().map(orderItemMapper::toEntity).collect(Collectors.toSet()))
-                .build();
-        return order;
-    }
-
 }

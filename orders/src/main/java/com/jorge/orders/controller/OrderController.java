@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
 public class OrderController {
-
     private final IOrderService orderService;
 
     @PostMapping
@@ -24,7 +23,7 @@ public class OrderController {
 
     @GetMapping("/{orderId}")
     public ResponseEntity<Order> getOrder(@PathVariable Long orderId) {
-        Order order = orderService.getInventory(orderId);
+        Order order = orderService.getOrder(orderId);
         if (order == null) {
             return ResponseEntity.notFound().build();
         }
