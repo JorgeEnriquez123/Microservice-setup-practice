@@ -1,5 +1,6 @@
 package com.jorge.inventory.service.impl;
 
+import com.jorge.inventory.handler.exception.ProductInventoryNotFoundException;
 import com.jorge.inventory.mapper.InventoryMapper;
 import com.jorge.inventory.model.Inventory;
 import com.jorge.inventory.repository.InventoryRepository;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,14 +29,22 @@ public class InventoryService implements IInventoryService {
     @Transactional
     @Override
     public Inventory getInventory(Long productId) {
-        return inventoryRepository.findByProductId(productId).orElse(null);
+        return inventoryRepository.findByProductId(productId).orElseThrow(
+                () -> new ProductInventoryNotFoundException("No Inventory by product id: " + productId));
+    }
+
+    @Transactional
+    @Override
+    public List<Inventory> getAllInventory() {
+        return inventoryRepository.findAll();
     }
 
     @Transactional
     @Override
     public void updateInventory(InventoryDto inventoryDto) {
-        Inventory inventory = inventoryRepository.findByProductId(inventoryDto.getProductId()).orElse(null);
-        assert inventory != null;
+        Inventory inventory = inventoryRepository.findByProductId(inventoryDto.getProductId()).orElseThrow(
+                () -> new ProductInventoryNotFoundException("No Inventory by product id: " + inventoryDto.getProductId())
+        );
         inventory.setQuantity(inventoryDto.getQuantity());
         inventory.setLastUpdated(LocalDateTime.now());
 
