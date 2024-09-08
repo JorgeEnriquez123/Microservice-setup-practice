@@ -39,13 +39,20 @@ public class InventoryService implements IInventoryService {
         return inventoryRepository.findAll();
     }
 
+    @Override
+    public boolean checkAvailability(Long productId, Integer quantity) {
+        Inventory inventory = inventoryRepository.findByProductId(productId).orElseThrow(
+                () -> new ProductInventoryNotFoundException("No Inventory by product id: " + productId));
+        return inventory.getQuantity() >= quantity;
+    }
+
     @Transactional
     @Override
-    public void updateInventory(InventoryDto inventoryDto) {
-        Inventory inventory = inventoryRepository.findByProductId(inventoryDto.getProductId()).orElseThrow(
-                () -> new ProductInventoryNotFoundException("No Inventory by product id: " + inventoryDto.getProductId())
+    public void updateInventory(Long productId, Integer quantity) {
+        Inventory inventory = inventoryRepository.findByProductId(productId).orElseThrow(
+                () -> new ProductInventoryNotFoundException("No Inventory by product id: " + productId)
         );
-        inventory.setQuantity(inventoryDto.getQuantity());
+        inventory.setQuantity(inventory.getQuantity() - quantity);
         inventory.setLastUpdated(LocalDateTime.now());
 
         inventoryRepository.save(inventory);

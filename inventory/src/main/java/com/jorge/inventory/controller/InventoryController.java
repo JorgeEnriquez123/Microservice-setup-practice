@@ -28,18 +28,24 @@ public class InventoryController {
         return ResponseEntity.ok(inventoryService.getAllInventory());
     }
 
-    @GetMapping("/product/{productId}")
+    @GetMapping("/{productId}")
     public ResponseEntity<Inventory> getProductInventory(@PathVariable Long productId) {
         return ResponseEntity.ok(inventoryService.getInventory(productId));
     }
 
-    @PutMapping
-    public ResponseEntity<Void> updateInventory(@RequestBody InventoryDto inventoryDto) {
-        inventoryService.updateInventory(inventoryDto);
+    @GetMapping("/{productId}/check-availability")
+    public ResponseEntity<Boolean> checkAvailability(@PathVariable Long productId, @RequestParam Integer quantity) {
+        boolean isAvailable = inventoryService.checkAvailability(productId, quantity);
+        return ResponseEntity.ok(isAvailable);
+    }
+
+    @PutMapping("/{productId}/reduce-stock")
+    public ResponseEntity<Void> updateInventory(@PathVariable Long productId, @RequestParam Integer quantity) {
+        inventoryService.updateInventory(productId, quantity);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/product/{productId}")
+    @DeleteMapping("/{productId}")
     public ResponseEntity<Void> deleteInventory(@PathVariable Long productId) {
         inventoryService.deleteInventory(productId);
         return ResponseEntity.noContent().build();
