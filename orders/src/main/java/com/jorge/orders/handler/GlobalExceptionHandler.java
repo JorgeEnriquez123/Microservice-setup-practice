@@ -1,6 +1,8 @@
 package com.jorge.orders.handler;
 
 import com.jorge.orders.handler.exception.OrderNotFoundException;
+import com.jorge.orders.handler.exception.ProductNotAvailableException;
+import com.jorge.orders.handler.exception.ProductNotFoundException;
 import com.jorge.orders.handler.response.ErrorResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,10 +15,26 @@ import java.util.Collections;
 public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(OrderNotFoundException.class)
-    public ErrorResponseDto handleProductInventoryNotFoundException(OrderNotFoundException e) {
+    public ErrorResponseDto handleOrderNotFoundException(OrderNotFoundException e) {
         return ErrorResponseDto.builder()
                 .httpStatus(HttpStatus.NOT_FOUND)
                 .message("Order Not Found")
+                .errors(Collections.singletonList(e.getMessage()))
+                .build();
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ErrorResponseDto handleProductNotFoundException(ProductNotFoundException e) {
+        return e.getErrorResponseDto();
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ProductNotAvailableException.class)
+    public ErrorResponseDto handleProductNotAvailableException(ProductNotAvailableException e) {
+        return ErrorResponseDto.builder()
+                .httpStatus(HttpStatus.BAD_REQUEST)
+                .message("Product not available")
                 .errors(Collections.singletonList(e.getMessage()))
                 .build();
     }

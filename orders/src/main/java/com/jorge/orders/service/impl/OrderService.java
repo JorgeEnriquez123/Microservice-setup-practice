@@ -1,21 +1,23 @@
 package com.jorge.orders.service.impl;
 
 import com.jorge.orders.dto.CreateOrderDto;
-import com.jorge.orders.dto.OrderDto;
+import com.jorge.orders.dto.OrderItemsDto;
+import com.jorge.orders.feign.InventoryServiceClient;
 import com.jorge.orders.handler.exception.OrderNotFoundException;
+import com.jorge.orders.handler.exception.ProductNotAvailableException;
+import com.jorge.orders.handler.exception.ProductNotFoundException;
 import com.jorge.orders.mapper.OrderItemMapper;
-import com.jorge.orders.mapper.OrderMapper;
 import com.jorge.orders.model.Order;
 import com.jorge.orders.model.OrderItem;
 import com.jorge.orders.repository.OrderRepository;
 import com.jorge.orders.service.IOrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,19 +26,24 @@ import java.util.stream.Collectors;
 public class OrderService implements IOrderService {
     private final OrderRepository orderRepository;
     private final OrderItemMapper orderItemMapper;
+    private final InventoryServiceClient inventoryClient;
 
     // hard-code products' ids and OrderItems will be saved with cascade
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void createOrder(CreateOrderDto orderDto) {
+        for(OrderItemsDto item : orderDto.getItems()) {
+            ResponseEntity<Boolean> isAvailable = inventoryClient.checkAvailability(item.getProductId(), item.getQuantity());
+            if(Boolean.FALSE.equals(isAvailable.getBody())) {
+                throw new ProductNotAvailableException("One of the products is not available due to low stock. Product ID: " + item.getProductId());
+            }
+        }
+
         Order order = Order.builder()
                 .customerId(orderDto.getCustomerId())
                 .build();
 
-        BigDecimal total = orderDto.getItems().stream().map(
-            item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()))
-        ).reduce(BigDecimal.ZERO, BigDecimal::add);
-
+        BigDecimal total = calculateTotal(orderDto.getItems());
         order.setTotalAmount(total);
         order.setStatus("PENDING");
         order.setCreatedAt(LocalDateTime.now());
@@ -47,6 +54,8 @@ public class OrderService implements IOrderService {
 
         order.setItems(orderItems);
         orderRepository.save(order);
+
+        //TODO Update Inventory with event driven mechanism
     }
 
     @Transactional(readOnly = true)
@@ -63,5 +72,11 @@ public class OrderService implements IOrderService {
                 () -> new OrderNotFoundException("Order not found with id: " + orderId));
         order.setStatus(status);
         orderRepository.save(order);
+    }
+
+    public BigDecimal calculateTotal(Set<OrderItemsDto> items){
+        return items.stream().map(
+                item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()))
+                ).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

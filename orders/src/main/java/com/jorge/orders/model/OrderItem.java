@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 @Table(name = "order_items")
+@ToString
 public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,6 +22,7 @@ public class OrderItem {
     @ManyToOne
     @JsonBackReference
     @JoinColumn(name = "order_id", nullable = false)
+    @ToString.Exclude
     private Order order;
 
     @Column(name = "product_id", nullable = false)
