@@ -20,7 +20,7 @@ resilience4j:
     configs:
       default:
         sliding-window-size: 5
-        permitted-number-of-calls-in-half-open-state: 2
+        permitted-number-of-calls-in-half-open-state: 3
         failure-rate-threshold: 50
         wait-duration-in-open-state:
           seconds: 10

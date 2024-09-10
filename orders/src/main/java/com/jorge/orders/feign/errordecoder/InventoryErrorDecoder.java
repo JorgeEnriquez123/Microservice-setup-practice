@@ -28,8 +28,10 @@ public class InventoryErrorDecoder implements ErrorDecoder {
             case 404 -> new ProductNotFoundException(errorResponseDto);
             default -> errorDecoder.decode(s, response);
         };*/
-        // Since Circuit Breaker's fallback is triggered for non 2xx code responses, which includes 404, I'm skipping this implementation.
-        // This implementation is more granular since it check for each status code.
+
+        // Since Circuit Breaker's fallback is triggered for non 2xx code responses, which includes 404,
+        // I'm skipping this implementation in favor of Circuit Breaker's fallback mechanism.
+        // This implementation is more granular since it behaves differently based on each status code you set
         return null;
     }
 }

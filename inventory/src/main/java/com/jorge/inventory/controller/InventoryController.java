@@ -4,6 +4,7 @@ import com.jorge.inventory.dto.InventoryDto;
 import com.jorge.inventory.model.Inventory;
 import com.jorge.inventory.service.IInventoryService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/inventory")
 @RequiredArgsConstructor
+@Slf4j
 public class InventoryController {
 
     private final IInventoryService inventoryService;
