@@ -21,7 +21,10 @@ public class GatewayserverApplication {
 				.route(p -> p
 						.path("/api/inventory/**")
 						.filters(f -> f
-								.addResponseHeader("X-Response-Time", LocalDateTime.now().toString()))
+								.addResponseHeader("X-Response-Time", LocalDateTime.now().toString())
+								.circuitBreaker(config -> config.setName("inventoryCircuitBreaker")
+										.setFallbackUri("forward:/contactSupport"))
+						)
 						.uri("lb://INVENTORY")
 				)
 				.route(p -> p
