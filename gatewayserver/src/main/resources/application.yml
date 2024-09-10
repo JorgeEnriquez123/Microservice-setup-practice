@@ -3,6 +3,11 @@ spring:
     name: gateway-server
   config:
     import: configserver:http://localhost:8888
+  cloud:
+    gateway:
+      httpclient:
+        connect-timeout: 5000
+        response-timeout: 5s
 
 server:
   port: 8072
