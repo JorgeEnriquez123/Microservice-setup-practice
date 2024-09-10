@@ -17,7 +17,7 @@ public class InventoryErrorDecoder implements ErrorDecoder {
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Override
     public Exception decode(String s, Response response) {
-        ErrorResponseDto errorResponseDto = null;
+        /*ErrorResponseDto errorResponseDto = null;
         try {
             errorResponseDto = objectMapper.readValue(
                     (IOUtils.toString(response.body().asInputStream(), StandardCharsets.UTF_8)), ErrorResponseDto.class);
@@ -27,6 +27,9 @@ public class InventoryErrorDecoder implements ErrorDecoder {
         return switch (response.status()){
             case 404 -> new ProductNotFoundException(errorResponseDto);
             default -> errorDecoder.decode(s, response);
-        };
+        };*/
+        // Since Circuit Breaker's fallback is triggered for non 2xx code responses, which includes 404, I'm skipping this implementation.
+        // This implementation is more granular since it check for each status code.
+        return null;
     }
 }
