@@ -4,6 +4,7 @@ import com.jorge.orders.dto.CreateOrderDto;
 import com.jorge.orders.dto.OrderDto;
 import com.jorge.orders.model.Order;
 import com.jorge.orders.service.IOrderService;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @RateLimiter(name = "getOrder", fallbackMethod = "getOrderFallback")
     @GetMapping("/{orderId}")
     public ResponseEntity<Order> getOrder(@PathVariable Long orderId) {
         Order order = orderService.getOrder(orderId);
@@ -28,6 +30,10 @@ public class OrderController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(order);
+    }
+
+    public ResponseEntity<String> getOrderFallback(Throwable throwable){
+        return ResponseEntity.ok("Too many requests! Calm down before making another request.");
     }
 
     @PatchMapping("/{orderId}")
