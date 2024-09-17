@@ -11,6 +11,7 @@
         <module name="config-server" />
         <module name="orders" />
         <module name="inventory" />
+        <module name="message" />
         <module name="eureka-server" />
       </profile>
     </annotationProcessing>
@@ -21,6 +22,7 @@
       <module name="eureka-server" options="-parameters" />
       <module name="gatewayserver" options="-parameters" />
       <module name="inventory" options="-parameters" />
+      <module name="message" options="-parameters" />
       <module name="orders" options="-parameters" />
     </option>
   </component>
