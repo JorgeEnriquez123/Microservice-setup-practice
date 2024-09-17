@@ -21,11 +21,11 @@ public class MessageFunctions {
     }
 
     @Bean
-    public Function<OrderMessageDto, OrderMessageDto> sms() {
+    public Function<OrderMessageDto, Long> sms() {
         return orderMessageDto -> {
             log.info("Sending Sms with Order details: {}", orderMessageDto);
             log.info("SMS Sent.");
-            return orderMessageDto;
+            return orderMessageDto.orderId();
         };
     }
 }

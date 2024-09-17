@@ -2,6 +2,7 @@ package com.jorge.orders.service.impl;
 
 import com.jorge.orders.dto.CreateOrderDto;
 import com.jorge.orders.dto.OrderItemsDto;
+import com.jorge.orders.dto.OrderMessageDto;
 import com.jorge.orders.feign.InventoryServiceClient;
 import com.jorge.orders.handler.exception.CantCheckProductException;
 import com.jorge.orders.handler.exception.OrderNotFoundException;
@@ -16,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +34,7 @@ public class OrderService implements IOrderService {
     private final OrderRepository orderRepository;
     private final OrderItemMapper orderItemMapper;
     private final InventoryServiceClient inventoryClient;
+    private final StreamBridge streamBridge;
 
     // hard-code products' ids and OrderItems will be saved with cascade
     @Transactional(rollbackFor = Exception.class)
@@ -62,9 +65,19 @@ public class OrderService implements IOrderService {
         orderItems.forEach(item -> item.setOrder(order));
 
         order.setItems(orderItems);
-        orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
 
-        //TODO Update Inventory with event driven mechanism
+        sendCommunication(savedOrder);
+    }
+
+    private void sendCommunication(Order order){
+        Long orderId = order.getId();
+        var orderMessageDto = new OrderMessageDto
+                (order.getId(), "Order with Id: " + orderId + " created successfully.");
+        log.info("Sending message to order with Id: {}", orderId);
+
+        var result = streamBridge.send("sendCommunication-out-0", orderMessageDto);
+        log.info("Is the communication successful? : {}", result);
     }
 
     @Transactional(readOnly = true)
