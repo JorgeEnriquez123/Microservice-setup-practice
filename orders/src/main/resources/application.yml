@@ -15,13 +15,17 @@ spring:
           group: ${spring.application.name}
         orderConfirmation-in-0:
           destination: confirmation-sent
+      kafka:
+        binder:
+          brokers:
+            - localhost:9092
 
-  rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
-    connection-timeout: 10s
+# rabbitmq:
+#   host: localhost
+#   port: 5672
+#   username: guest
+#   password: guest
+#   connection-timeout: 10s
 
 server:
   port: 8090
