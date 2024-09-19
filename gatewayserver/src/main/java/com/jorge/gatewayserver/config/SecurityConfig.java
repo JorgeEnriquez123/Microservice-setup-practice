@@ -31,14 +31,22 @@ public class SecurityConfig {
         serverHttpSecurity
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(HttpMethod.GET).permitAll()
-                        .pathMatchers("/api/inventory/**", "/api/orders/**").authenticated()
+                        .pathMatchers("/api/inventory/**").hasRole("INVENTORY")
+                        .pathMatchers("/api/orders/**").hasRole("ORDER")
                         .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(Customizer.withDefaults())
-                )
-                .csrf(ServerHttpSecurity.CsrfSpec::disable);
+                        .jwt(jwtSpec -> jwtSpec.jwtAuthenticationConverter(grantedAuthoritiesExtractor())))
+                .csrf(csrf -> csrf.disable());
 
         return serverHttpSecurity.build();
+    }
+
+    private Converter<Jwt, Mono<AbstractAuthenticationToken>> grantedAuthoritiesExtractor() {
+        JwtAuthenticationConverter jwtAuthenticationConverter =
+                new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter
+                (new KeycloakRoleConverter());
+        return new ReactiveJwtAuthenticationConverterAdapter(jwtAuthenticationConverter);
     }
 }
