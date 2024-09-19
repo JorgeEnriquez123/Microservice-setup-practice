@@ -14,6 +14,12 @@ spring:
       host: localhost
       port: 6379
       connect-timeout: 200
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: "http://localhost:7080/realms/master"
+          jwk-set-uri: "http://localhost:7080/realms/master/protocol/openid-connect/certs"
 
 server:
   port: 8072
@@ -31,3 +37,7 @@ resilience4j:
         wait-duration-in-open-state:
           seconds: 10
 
+logging:
+  level:
+    org.springframework.security: debug
+    org.springframework.security.oauth2: DEBUG
