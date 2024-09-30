@@ -30,10 +30,10 @@ public class SecurityConfig {
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity serverHttpSecurity) {
         serverHttpSecurity
                 .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers(HttpMethod.GET).permitAll()
+/*                        .pathMatchers(HttpMethod.GET).permitAll()
                         .pathMatchers("/api/inventory/**").hasRole("INVENTORY")
-                        .pathMatchers("/api/orders/**").hasRole("ORDER")
-                        .anyExchange().authenticated()
+                        .pathMatchers("/api/orders/**").hasRole("ORDER")*/
+                        .anyExchange().permitAll()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwtSpec -> jwtSpec.jwtAuthenticationConverter(grantedAuthoritiesExtractor())))

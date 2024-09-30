@@ -27,6 +27,16 @@ spring:
 #   password: guest
 #   connection-timeout: 10s
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
 server:
   port: 8090
 
